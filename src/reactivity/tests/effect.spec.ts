@@ -62,8 +62,9 @@ describe("effect", () => {
     obj.prop = 2;
     expect(dummy).toBe(2);
     stop(runner);
-    obj.prop = 3
-    // obj.prop++;
+    // obj.prop = 3
+    // obj.prop = obj.prop + 1 此时会触发 get 和 set
+    obj.prop++;
     expect(dummy).toBe(2);
 
     // stopped effect should still be manually callable
