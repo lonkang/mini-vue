@@ -4,6 +4,9 @@ export function render(VNode, container) {
   patch(VNode, container);
 }
 function patch(VNode, container) {
+  // todo 判断Vnode是不是一个element
+  // 是element就处理element
+  // processElement()
   // 处理组件
   processComponent(VNode, container);
 }

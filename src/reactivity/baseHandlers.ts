@@ -1,7 +1,7 @@
-import { extend } from "./shared/index";
+import { extend } from "../shared/index";
 import { track, trigger } from "./effect";
 import { reactive, ReactiveFlags, readonly } from "./reactive";
-import { isObject } from "./shared";
+import { isObject } from "../shared";
 const get = createGetters();
 const set = createSetters();
 const readonlyGet = createGetters(true)
