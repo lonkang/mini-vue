@@ -1,4 +1,4 @@
-import {createVNode} from './vnode'
-export function h(type, props?, childre?) {
-  return createVNode(type, props, childre)
+import {createvnode} from './vnode'
+export function h(type, props?, children?) {
+  return createvnode(type, props, children)
 }

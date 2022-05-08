@@ -1,7 +1,7 @@
-export function createCompomentInstace(VNode) {
+export function createCompomentInstace(vnode) {
   const component = {
-    VNode,
-    type: VNode.type,
+    vnode,
+    type: vnode.type,
   };
   return component;
 }
@@ -34,6 +34,6 @@ function handleSetupResult(instance, setUpResult) {
 function finishSetupComponent(instance: any) {
   const Compoment = instance.type;
   if (Compoment.render) {
-    Compoment.render = Compoment.render;
+    instance.render = Compoment.render;
   }
 }

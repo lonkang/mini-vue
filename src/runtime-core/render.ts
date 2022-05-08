@@ -1,20 +1,52 @@
+import { isObject } from "../shared/index";
 import { createCompomentInstace, setupComponent } from "./compoment";
 
-export function render(VNode, container) {
-  patch(VNode, container);
+export function render(vnode, container) {
+  patch(vnode, container);
 }
-function patch(VNode, container) {
-  // todo 判断Vnode是不是一个element
+function patch(vnode, container) {
+  // todo 判断vnode是不是一个element
   // 是element就处理element
-  // processElement()
   // 处理组件
-  processComponent(VNode, container);
+  console.log(vnode.type);
+  if (typeof vnode.type === "string") {
+    processElement(vnode, container);
+  } else if (isObject(vnode.type)) {
+    processComponent(vnode, container);
+  }
 }
-function processComponent(VNode, container) {
-  mountCompoment(VNode, container);
+
+function processElement(vnode, container) {
+  mountElement(vnode, container);
 }
-function mountCompoment(VNode: any, container) {
-  const instace = createCompomentInstace(VNode);
+function mountElement(vnode, container) {
+  const { type, children, props } = vnode;
+
+  const el = document.createElement(type);
+
+  if (typeof children === "string") {
+    el.textContent = children;
+  } else if (Array.isArray(children)) {
+    mountChildren(children, el);
+  }
+
+  for (const key in props) {
+    const val = props[key];
+    el.setAttribute(key, val);
+  }
+  container.append(el);
+}
+function mountChildren(children, container) {
+  children.forEach((v) => {
+    patch(v, container);
+  });
+}
+
+function processComponent(vnode, container) {
+  mountCompoment(vnode, container);
+}
+function mountCompoment(vnode: any, container) {
+  const instace = createCompomentInstace(vnode);
   setupComponent(instace);
   setupRenderEffect(instace, container);
 }

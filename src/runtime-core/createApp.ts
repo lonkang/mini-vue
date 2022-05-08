@@ -1,14 +1,14 @@
 import { render } from "./render";
-import { createVNode } from "./vnode";
+import { createvnode } from "./vnode";
 
 export function createApp(rootComponent) {
   return {
     mouted(rootContainer) {
-      // VNode
-      // component => VNode
-      // 再对VNode进行处理
-      const VNode = createVNode(rootComponent);
-      render(VNode, rootContainer);
+      // vnode
+      // component => vnode
+      // 再对vnode进行处理
+      const vnode = createvnode(rootComponent);
+      render(vnode, rootContainer);
     },
   };
 }
