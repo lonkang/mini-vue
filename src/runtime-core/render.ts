@@ -51,7 +51,9 @@ function mountCompoment(vnode: any, container) {
   setupRenderEffect(instace, container);
 }
 function setupRenderEffect(instace, container) {
-  const subTree = instace.render();
+  // 绑定proxy
+  const { proxy } = instace;
+  const subTree = instace.render.call(proxy);
 
   // vnode => patch
   // vnode => element => mountCompoment
