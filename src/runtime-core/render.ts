@@ -22,7 +22,7 @@ function processElement(vnode, container) {
 function mountElement(vnode, container) {
   const { type, children, props } = vnode;
 
-  const el = document.createElement(type);
+  const el = (vnode.el = document.createElement(type));
 
   if (typeof children === "string") {
     el.textContent = children;
@@ -48,9 +48,9 @@ function processComponent(vnode, container) {
 function mountCompoment(vnode: any, container) {
   const instace = createCompomentInstace(vnode);
   setupComponent(instace);
-  setupRenderEffect(instace, container);
+  setupRenderEffect(instace,vnode, container);
 }
-function setupRenderEffect(instace, container) {
+function setupRenderEffect(instace,vnode, container) {
   // 绑定proxy
   const { proxy } = instace;
   const subTree = instace.render.call(proxy);
@@ -58,4 +58,5 @@ function setupRenderEffect(instace, container) {
   // vnode => patch
   // vnode => element => mountCompoment
   patch(subTree, container);
+  vnode.el = subTree.el
 }

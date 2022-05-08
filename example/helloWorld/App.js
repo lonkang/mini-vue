@@ -1,6 +1,8 @@
 import { h } from "../../lib/mini-vue.esm.js";
+window.self = null
 export const App = {
   render() {
+    window.self = this
     return h(
       "div",
       {
@@ -12,7 +14,7 @@ export const App = {
   },
   setUp() {
     return {
-      msg: "mini-vue",
+      msg: "mini-vue-flag",
     };
   },
 };
