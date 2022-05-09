@@ -1,6 +1,8 @@
 import { h } from "../../lib/mini-vue.esm.js";
+import { Foo } from "./Foo.js";
 window.self = null;
 export const App = {
+  name: 'App',
   render() {
     window.self = this;
     return h(
@@ -15,7 +17,11 @@ export const App = {
           console.log("mosedown");
         },
       },
-      [h("p", { class: "red" }, "hi"), h("p", { class: "blue" }, this.msg)]
+      [
+        h("p", { class: "red" }, "hi"),
+        h("p", { class: "blue" }, this.msg),
+        h(Foo, { count: 1 }),
+      ]
     );
   },
   setUp() {

@@ -1,3 +1,4 @@
+import { isObject } from './../shared/index';
 import { mutableHandlers, readonlyHandlers, shallowReadonlyHandlers } from './baseHandlers'
 
 
@@ -12,6 +13,9 @@ export function readonly(raw) {
   return createActiveObject(raw, readonlyHandlers)
 }
 export function shallowReadonly(raw) {
+  if(!isObject(raw)) {
+    return console.warn('raw is not object')
+  }
   return createActiveObject(raw, shallowReadonlyHandlers)
 }
 
