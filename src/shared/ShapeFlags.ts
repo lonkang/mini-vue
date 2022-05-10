@@ -7,4 +7,6 @@ export const enum ShapeFlags {
   TEXT_CHILDREN = 1 << 3,
   // vnode 的 children 为数组类型
   ARRAY_CHILDREN = 1 << 4,
+  // 插槽类型
+  SLOT_CHILDREN = 1 << 5,
 }
