@@ -9,7 +9,7 @@ export const Foo = {
       renderSlots(this.$slots, "footer"),
     ]);
   },
-  setUp(props, { emit }) {
+  setup(props, { emit }) {
     return {};
   },
 };

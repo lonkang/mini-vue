@@ -11,7 +11,7 @@ export function createCompomentInstace(vnode) {
     setupState: {},
     props: {},
     emit: () => {},
-    slots: {}
+    slots: {},
   };
   component.emit = emit.bind(null, component) as any;
 
@@ -22,7 +22,7 @@ export function setupComponent(instance) {
 
   initProps(instance, instance.vnode.props);
   // initSLots
-  initSlots(instance, instance.vnode.children)
+  initSlots(instance, instance.vnode.children);
 
   setupStatefulComponent(instance);
 }
@@ -31,11 +31,13 @@ function setupStatefulComponent(instance) {
   const Compoment = instance.type;
   // ctx
   instance.proxy = new Proxy({ _: instance }, publicInstaceProxyHandlers);
-  const { setUp } = Compoment;
-  if (setUp) {
-    const setupResult = setUp(shallowReadonly(instance.props), {
+  const { setup } = Compoment;
+  if (setup) {
+    setCurrentInstance(instance);
+    const setupResult = setup(shallowReadonly(instance.props), {
       emit: instance.emit,
     });
+    setCurrentInstance(null);
     handleSetupResult(instance, setupResult);
   }
 }
@@ -53,4 +55,12 @@ function finishSetupComponent(instance: any) {
   if (Compoment.render) {
     instance.render = Compoment.render;
   }
+}
+
+let currentInstance = null;
+export function setCurrentInstance(instance) {
+  currentInstance = instance;
+}
+export function getCurrentInstance(instance) {
+  return currentInstance;
 }

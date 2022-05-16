@@ -3,7 +3,7 @@ export const Foo = {
   render() {
     return h("div", {}, "foo" + this.count);
   },
-  setUp(props) {
+  setup(props) {
     console.log(props);
     props.count++;
   },

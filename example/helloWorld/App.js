@@ -24,7 +24,7 @@ export const App = {
       ]
     );
   },
-  setUp() {
+  setup() {
     return {
       msg: "mini-vue-flag",
     };

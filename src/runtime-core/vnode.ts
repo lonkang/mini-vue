@@ -1,5 +1,9 @@
-import { isObject } from './../shared/index';
+import { isObject } from "./../shared/index";
 import { ShapeFlags } from "../shared/ShapeFlags";
+
+export const Fragment = Symbol("Fragment");
+
+export const Text = Symbol("Text");
 
 export function createvnode(type, props?, children?) {
   const vnode = {
@@ -17,13 +21,17 @@ export function createvnode(type, props?, children?) {
     vnode.ShapeFlag |= ShapeFlags.ARRAY_CHILDREN;
   }
   if (vnode.ShapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
-    if(isObject(children)) {
+    if (isObject(children)) {
       vnode.ShapeFlag |= ShapeFlags.SLOT_CHILDREN;
     }
   }
 
   return vnode;
 }
+export function createTextVNode(text: string) {
+  return createvnode(Text, {}, text);
+}
+
 // 基于 type 来判断是什么类型的组件
 function getShapeFlag(type: any) {
   return typeof type === "string"

@@ -5,7 +5,7 @@ export const Foo = {
     const foo = h("p", {}, "foo");
     return h("div", {}, [foo, btn]);
   },
-  setUp(props, { emit }) {
+  setup(props, { emit }) {
     const emitAdd = () => {
       emit("add", 1, 2);
       emit("add-foo");
