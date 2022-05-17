@@ -4,7 +4,8 @@ import { initProps } from "./componentProps";
 import { publicInstaceProxyHandlers } from "./componentPublickIntace";
 import { initSlots } from "./componentSlots";
 
-export function createCompomentInstace(vnode) {
+export function createCompomentInstace(vnode, parent) {
+  console.log("parentComponent", parent);
   const component = {
     vnode,
     type: vnode.type,
@@ -12,6 +13,8 @@ export function createCompomentInstace(vnode) {
     props: {},
     emit: () => {},
     slots: {},
+    provides: parent ? parent.provides : {},
+    parent,
   };
   component.emit = emit.bind(null, component) as any;
 
@@ -61,6 +64,6 @@ let currentInstance = null;
 export function setCurrentInstance(instance) {
   currentInstance = instance;
 }
-export function getCurrentInstance(instance) {
+export function getCurrentInstance() {
   return currentInstance;
 }
