@@ -1,4 +1,5 @@
 import { effect } from "../reactivity/effect";
+import { EMPTY_OBJ } from "../shared";
 import { ShapeFlags } from "../shared/ShapeFlags";
 import { createCompomentInstace, setupComponent } from "./compoment";
 import { createAppAPI } from "./createApp";
@@ -55,10 +56,33 @@ export function createRenderer(options) {
     }
   }
   function patchElement(n1, n2, container) {
-    console.log('patchElement')
-    console.log('n1', n1)
-    console.log('n2', n2)
+    console.log("patchElement");
+    console.log("n1", n1);
+    console.log("n2", n2);
+    const el = (n2.el = n1.el);
+    const oldProps = n1.props || EMPTY_OBJ;
+    const newProps = n2.props || EMPTY_OBJ;
+    patchProps(el, oldProps, newProps);
   }
+  function patchProps(el, oldProps, newProps) {
+    if (oldProps !== newProps) {
+      for (let key in newProps) {
+        let prevProp = oldProps[key];
+        let nextProp = newProps[key];
+        if (prevProp !== nextProp) {
+          hostPatchProp(el, key, prevProp, nextProp);
+        }
+      }
+      if(newProps !== EMPTY_OBJ) {
+        for (let key in oldProps) {
+          if (!newProps[key]) {
+            hostPatchProp(el, key, oldProps[key], null);
+          }
+        }
+      }
+    }
+  }
+
   function mountElement(vnode, container, parentComponent) {
     const { type, children, props, ShapeFlag } = vnode;
 
@@ -72,7 +96,8 @@ export function createRenderer(options) {
     // 处理props
     for (const key in props) {
       const val = props[key];
-      hostPatchProp(el, key, val);
+      // 初始化传递null
+      hostPatchProp(el, key, null, val);
     }
     insert(el, container);
 
@@ -99,7 +124,7 @@ export function createRenderer(options) {
       if (!isMounted) {
         const subTree = instace.render.call(proxy);
         instace.subTree = subTree;
-        instace.isMounted = true
+        instace.isMounted = true;
         // vnode => patch
         // vnode => element => mountCompoment
         patch(null, subTree, container, instace);
