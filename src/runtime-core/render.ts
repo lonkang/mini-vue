@@ -10,6 +10,8 @@ export function createRenderer(options) {
     createElement: hostCreateElement,
     patchProp: hostPatchProp,
     insert,
+    remove: hostRemove,
+    setElementText: hostSetElementText,
   } = options;
   function render(vnode, container) {
     patch(null, vnode, container, null);
@@ -52,17 +54,46 @@ export function createRenderer(options) {
     if (!n1) {
       mountElement(n2, container, parentComponent);
     } else {
-      patchElement(n1, n2, container);
+      patchElement(n1, n2, container, parentComponent);
     }
   }
-  function patchElement(n1, n2, container) {
+  function patchElement(n1, n2, container, parentComponent) {
     console.log("patchElement");
     console.log("n1", n1);
     console.log("n2", n2);
     const el = (n2.el = n1.el);
     const oldProps = n1.props || EMPTY_OBJ;
     const newProps = n2.props || EMPTY_OBJ;
+    patchChildren(n1, n2, container, parentComponent);
+
     patchProps(el, oldProps, newProps);
+  }
+  function patchChildren(n1, n2, container, parentComponent) {
+    const { prevShapleFlag, children: c1 } = n1;
+    const { shapeFlag, children: c2 } = n2;
+    // 新的是text节点老的是文本数组节点
+    if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
+      if (prevShapleFlag & ShapeFlags.ARRAY_CHILDREN) {
+        // 1. 把老的children删掉
+        unMountChildren(n1.children);
+      }
+      // 设置 text
+      if (c1 !== c2) {
+        hostSetElementText(container, c2);
+      }
+    } else {
+      // 旧节点是text
+      if (prevShapleFlag & ShapeFlags.TEXT_CHILDREN) {
+        hostSetElementText(container, "");
+        mountChildren(c2, container, parentComponent);
+      }
+    }
+  }
+  function unMountChildren(children) {
+    for (let i = 0; i < children.length; i++) {
+      // remove
+      hostRemove(children[i]);
+    }
   }
   function patchProps(el, oldProps, newProps) {
     if (oldProps !== newProps) {
@@ -73,7 +104,7 @@ export function createRenderer(options) {
           hostPatchProp(el, key, prevProp, nextProp);
         }
       }
-      if(newProps !== EMPTY_OBJ) {
+      if (newProps !== EMPTY_OBJ) {
         for (let key in oldProps) {
           if (!newProps[key]) {
             hostPatchProp(el, key, oldProps[key], null);
