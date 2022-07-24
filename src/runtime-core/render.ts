@@ -64,15 +64,15 @@ export function createRenderer(options) {
     const el = (n2.el = n1.el);
     const oldProps = n1.props || EMPTY_OBJ;
     const newProps = n2.props || EMPTY_OBJ;
-    patchChildren(n1, n2, container, parentComponent);
+    patchChildren(n1, n2, el, parentComponent);
 
     patchProps(el, oldProps, newProps);
   }
   function patchChildren(n1, n2, container, parentComponent) {
-    const { prevShapleFlag, children: c1 } = n1;
-    const { shapeFlag, children: c2 } = n2;
+    const { ShapeFlag:prevShapleFlag, children: c1 } = n1;
+    const { ShapeFlag, children: c2 } = n2;
     // 新的是text节点老的是文本数组节点
-    if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
+    if (ShapeFlag & ShapeFlags.TEXT_CHILDREN) {
       if (prevShapleFlag & ShapeFlags.ARRAY_CHILDREN) {
         // 1. 把老的children删掉
         unMountChildren(n1.children);
@@ -91,8 +91,9 @@ export function createRenderer(options) {
   }
   function unMountChildren(children) {
     for (let i = 0; i < children.length; i++) {
+      const el = children[i].el
       // remove
-      hostRemove(children[i]);
+      hostRemove(el);
     }
   }
   function patchProps(el, oldProps, newProps) {

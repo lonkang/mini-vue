@@ -24,7 +24,9 @@ function insert(el, parent) {
 }
 function remove(children) {
   const parent = children.parentNode;
-  parent.removeChild(children);
+  if(parent) {
+    parent.removeChild(children);
+  }
 }
 function setElementText(el, text) {
   el.textContent = text;
