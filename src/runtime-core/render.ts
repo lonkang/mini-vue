@@ -69,7 +69,7 @@ export function createRenderer(options) {
     patchProps(el, oldProps, newProps);
   }
   function patchChildren(n1, n2, container, parentComponent) {
-    const { ShapeFlag:prevShapleFlag, children: c1 } = n1;
+    const { ShapeFlag: prevShapleFlag, children: c1 } = n1;
     const { ShapeFlag, children: c2 } = n2;
     // 新的是text节点老的是文本数组节点
     if (ShapeFlag & ShapeFlags.TEXT_CHILDREN) {
@@ -83,15 +83,57 @@ export function createRenderer(options) {
       }
     } else {
       // 旧节点是text
+      // text to array
       if (prevShapleFlag & ShapeFlags.TEXT_CHILDREN) {
         hostSetElementText(container, "");
         mountChildren(c2, container, parentComponent);
+      } else {
+        // array to array
+        patchKeyedChildren(c1, c2, container, parentComponent);
+      }
+    }
+  }
+
+  function patchKeyedChildren(c1, c2, container, parentComponent) {
+    let i = 0;
+    let e1 = c1.length - 1;
+    let e2 = c2.length - 1;
+    function isSameVNodeType(n1, n2) {
+      return n1.type === n2.type && n1.key === n2.key;
+    }
+    // 从左边开始找出不一样的
+    while (i <= e1 && i <= e2) {
+      const n1 = c1[i];
+      const n2 = c2[i];
+      if (isSameVNodeType(n1, n2)) {
+        patch(n1, n2, container, parentComponent);
+      } else {
+        break;
+      }
+      i++;
+    }
+    // 从右边开始往左找出不一样的
+    while (i <= e1 && i <= e2) {
+      const n1 = c1[i];
+      const n2 = c2[i];
+      if (isSameVNodeType(n1, n2)) {
+        patch(n1, n2, container, parentComponent);
+      } else {
+        break;
+      }
+      e1--;
+      e2--;
+    }
+    // 如果新的比老的多 就创建
+    if (i > e1) {
+      if (i <= e2) {
+        patch(null, c2[i], container, parentComponent);
       }
     }
   }
   function unMountChildren(children) {
     for (let i = 0; i < children.length; i++) {
-      const el = children[i].el
+      const el = children[i].el;
       // remove
       hostRemove(el);
     }
