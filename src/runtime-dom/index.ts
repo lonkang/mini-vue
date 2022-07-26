@@ -19,12 +19,12 @@ function patchProp(el, key, preVal, nextVal) {
   }
 }
 
-function insert(el, parent) {
-  parent.append(el);
+function insert(children, parent, anchor) {
+  parent.insertBefore(children, anchor || null);
 }
 function remove(children) {
   const parent = children.parentNode;
-  if(parent) {
+  if (parent) {
     parent.removeChild(children);
   }
 }
