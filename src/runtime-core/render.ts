@@ -142,7 +142,54 @@ export function createRenderer(options) {
         i++;
       }
     } else {
-      // 乱序的部分
+      // 乱序的部分也就是中间的部分进行对比
+      const s1 = i;
+      const s2 = i;
+
+      let patched = 0; // 统计对比过的数量
+      const toBePatched = e2 - s2 + 1; // 未处理的新节点剩余数量
+
+      const keyToNewMap = new Map();
+      // 遍历剩余的新节点，生成一份节点key -> index 的映射表keyToNewIndexMap
+      for (let i = s2; i <= e2; i++) {
+        const nextChild = c2[i];
+        if (nextChild.key !== null) {
+          keyToNewMap.set(nextChild.key, i);
+        }
+      }
+      // 2. 从新节点中找出老节点
+      for (let i = s1; i <= e1; i++) {
+        let prevChild = c1[i];
+
+        // 当旧节点超过新节点的时候，直接删除节点
+        if (patched >= toBePatched) {
+          hostRemove(prevChild.el);
+          continue;
+        }
+
+        let newIndex;
+
+        if (prevChild.key !== null) {
+          // 如果当前旧节点存在key值，则从keyToNewIndexMap映射表查找有没有对应的新节点，有则获取其下标
+          newIndex = keyToNewMap.get(prevChild.key);
+        } else {
+          for (let j = s2; j <= e2; j++) {
+            if (isSameVNodeType(prevChild, c2[j])) {
+              newIndex = j;
+              break;
+            }
+          }
+        }
+        if (newIndex === undefined) {
+          // 如果老节点中不载新节点列表中，那就删除
+          hostRemove(prevChild.el);
+        } else {
+          // 如果存在就进行patch
+          patch(prevChild, c2[newIndex], container, parentComponent, null);
+          patched++;
+        }
+      }
+      // let
     }
   }
   function unMountChildren(children) {

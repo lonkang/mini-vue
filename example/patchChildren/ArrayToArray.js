@@ -28,36 +28,35 @@ import { h, ref } from "../../lib/mini-vue.esm.js";
 // const nextChildren =  [h('span', { key: 'A' }, 'A'), h('span', { key: 'B' }, 'B')]
 
 // // ABC -> BC
-const prevChildren = [
-  h("span", { key: "A" }, "A"),
-  h("span", { key: "B" }, "B"),
-  h("span", { key: "C" }, "C"),
-];
-const nextChildren = [
-  h("span", { key: "B" }, "B"),
-  h("span", { key: "C" }, "C"),
-];
+// const prevChildren = [
+//   h("span", { key: "A" }, "A"),
+//   h("span", { key: "B" }, "B"),
+//   h("span", { key: "C" }, "C"),
+// ];
+// const nextChildren = [
+//   h("span", { key: "B" }, "B"),
+//   h("span", { key: "C" }, "C"),
+// ];
 
 // // ABCEDFG -> ABECFG
 // {
-//   prevChildren: [
-//     h('span', { key: 'A' }, 'A'),
-//     h('span', { key: 'B' }, 'B'),
-//     h('span', { key: 'C' }, 'C'),
-//     h('span', { key: 'E' }, 'E'),
-//     h('span', { key: 'D' }, 'D'),
-//     h('span', { key: 'F' }, 'F'),
-//     h('span', { key: 'G' }, 'G'),
-//   ],
-//   nextChildren: [
-//     h('span', { key: 'A' }, 'A'),
-//     h('span', { key: 'B' }, 'B'),
-//     h('span', { key: 'E' }, 'E'),
-//     h('span', { key: 'C' }, 'C'),
-//     h('span', { key: 'F' }, 'F'),
-//     h('span', { key: 'G' }, 'G'),
-//   ],
-// },
+const prevChildren = [
+  h("span", { key: "A" }, "A"),
+  h("span", { key: "B" }, "B"),
+  h("span", { key: "C", id: 'c-prev' }, "C"),
+  h("span", { key: "E" }, "E"),
+  h("span", { key: "D" }, "D"),
+  h("span", { key: "F" }, "F"),
+  h("span", { key: "G" }, "G"),
+];
+const nextChildren = [
+  h("span", { key: "A" }, "A"),
+  h("span", { key: "B" }, "B"),
+  h("span", { key: "E" }, "E"),
+  h("span", { key: "C", id: 'c-next' }, "C"),
+  h("span", { key: "F" }, "F"),
+  h("span", { key: "G" }, "G"),
+];
 
 export default {
   name: "ArrayToText",
