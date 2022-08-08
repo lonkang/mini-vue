@@ -9,6 +9,7 @@ export function createvnode(type, props?, children?) {
   const vnode = {
     type,
     props,
+    component: null,
     key: props && props.key,
     children,
     el: null,

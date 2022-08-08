@@ -2,6 +2,7 @@ import { effect } from "../reactivity/effect";
 import { EMPTY_OBJ } from "../shared";
 import { ShapeFlags } from "../shared/ShapeFlags";
 import { createCompomentInstace, setupComponent } from "./compoment";
+import { shouldUpdateComponent } from "./componentRenderUtil";
 import { createAppAPI } from "./createApp";
 import { Fragment, Text } from "./vnode";
 
@@ -283,12 +284,34 @@ export function createRenderer(options) {
   }
 
   function processComponent(n1, n2, container, parentComponent, anchor) {
-    mountCompoment(n2, container, parentComponent, anchor);
+    if (!n1) {
+      mountCompoment(n2, container, parentComponent, anchor);
+    } else {
+      updateComponent(n1, n2);
+    }
   }
   function mountCompoment(vnode: any, container, parentComponent, anchor) {
-    const instace = createCompomentInstace(vnode, parentComponent);
+    const instace = (vnode.component = createCompomentInstace(
+      vnode,
+      parentComponent
+    ));
     setupComponent(instace);
     setupRenderEffect(instace, vnode, container, anchor);
+  }
+  function updateComponent(n1, n2) {
+    const instance = (n2.component = n1.component);
+    if (shouldUpdateComponent(n1, n2)) {
+      console.log(`组件需要更新: ${instance}`);
+      // 那么 next 就是新的 vnode 了（也就是 n2）
+      instance.next = n2;
+      instance.update();
+    } else {
+      console.log(`组件不需要更新: ${instance}`);
+      // 不需要更新的话，那么只需要覆盖下面的属性即可
+      n2.component = n1.component;
+      n2.el = n1.el;
+      instance.vnode = n2;
+    }
   }
   function setupRenderEffect(instace, vnode, container, anchor) {
     effect(() => {
@@ -303,12 +326,22 @@ export function createRenderer(options) {
         patch(null, subTree, container, instace, anchor);
         vnode.el = subTree.el;
       } else {
+        const { next, vnode } = instace;
+        if (next) {
+          next.el = vnode.el;
+          updateComponentPreRender(instace, next);
+        }
         const subTree = instace.render.call(proxy);
         const prevSubTree = instace.subTree;
         instace.subTree = subTree;
         patch(prevSubTree, subTree, container, instace, anchor);
       }
     });
+  }
+  function updateComponentPreRender(instace, next) {
+    instace.vnode = next;
+    instace.next = null;
+    instace.props = next.props;
   }
   return {
     createApp: createAppAPI(render),
