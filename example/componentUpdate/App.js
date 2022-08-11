@@ -1,26 +1,46 @@
 import { ref, h } from "../../lib/mini-vue.esm.js";
+import { Child } from "./Child.js";
 export const App = {
   name: "App",
   setup() {
-    const count = ref(0);
-    const onClick = () => {
+    const count = ref(1);
+    const msg = ref("123");
+    window.msg = msg;
+    const changeChildProps = () => {
+      msg.value = "456";
+    };
+
+    const changeCount = () => {
       count.value++;
     };
     return {
       count,
-      onClick,
+      msg,
+      changeCount,
+      changeChildProps,
     };
   },
   render() {
     return h("div", { id: "root" }, [
-      h("div", {}, "count: " + this.count),
+      h("div", {}, "你好"),
+      h("p", {}, "count: " + this.count),
       h(
         "button",
         {
-          onClick: this.onClick,
+          onClick: this.changeCount,
         },
-        "click"
+        "change self count"
       ),
+      h(
+        "button",
+        {
+          onClick: this.changeChildProps,
+        },
+        "update child props"
+      ),
+      h(Child, {
+        msg: this.msg,
+      }),
     ]);
   },
 };

@@ -4,6 +4,7 @@ import { ShapeFlags } from "../shared/ShapeFlags";
 import { createCompomentInstace, setupComponent } from "./compoment";
 import { shouldUpdateComponent } from "./componentRenderUtil";
 import { createAppAPI } from "./createApp";
+import { queueJob } from "./scheduler";
 import { Fragment, Text } from "./vnode";
 
 export function createRenderer(options) {
@@ -307,14 +308,12 @@ export function createRenderer(options) {
       instance.update();
     } else {
       console.log(`组件不需要更新: ${instance}`);
-      // 不需要更新的话，那么只需要覆盖下面的属性即可
-      n2.component = n1.component;
       n2.el = n1.el;
       instance.vnode = n2;
     }
   }
   function setupRenderEffect(instace, vnode, container, anchor) {
-    effect(() => {
+    function componentUpdateFn() {
       // 绑定proxy 使得render函数能使用this
       const { proxy, isMounted } = instace;
       if (!isMounted) {
@@ -336,6 +335,12 @@ export function createRenderer(options) {
         instace.subTree = subTree;
         patch(prevSubTree, subTree, container, instace, anchor);
       }
+    }
+    instace.update = effect(componentUpdateFn, {
+      scheduler: () => {
+        // 把 effect 推到微任务的时候在执行
+        queueJob(instace.update);
+      },
     });
   }
   function updateComponentPreRender(instace, next) {
