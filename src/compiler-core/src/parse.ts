@@ -1,17 +1,44 @@
 import { NodeTypes } from "./ast";
-
+const enum TagsType {
+  Start,
+  End,
+}
 export const baseParse = (content: string) => {
   const context = createParseContext(content);
   return createRoot(parseChildren(context));
 };
 function parseChildren(context) {
+  const { source } = context;
   const nodes: any = [];
   let node;
-  // if (context.source.startsWith("{{")) {
-  node = parseInterpolation(context);
-  // }
+  if (source.startsWith("{{")) {
+    node = parseInterpolation(context);
+  } else if (source[0] === "<") {
+    if (/[a-z]/i.test(source[1])) {
+      node = parseElement(context);
+    }
+  }
   nodes.push(node);
   return nodes;
+}
+function parseElement(context) {
+  // 1.解析tag
+  const element = parseTag(context, TagsType.Start);
+  parseTag(context, TagsType.End);
+  return element;
+}
+function parseTag(context, type: TagsType) {
+  const match: any = /^<\/?([a-z]*)/i.exec(context.source);
+  const tag = match[1];
+  // 删除处理完成的代码
+  advanceBy(context, match[0].length);
+  // 删除>
+  advanceBy(context, 1);
+  if (type === TagsType.End) return;
+  return {
+    type: NodeTypes.ELEMENT,
+    tag,
+  };
 }
 
 function parseInterpolation(context: any) {
