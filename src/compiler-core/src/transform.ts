@@ -1,8 +1,12 @@
-export function transform(ast, options) {
-  const context = createTransformContext(ast, options);
+export function transform(root, options = {}) {
+  const context = createTransformContext(root, options);
   // 1. 遍历-深度优先搜素
-  traverseNode(ast, context);
+  traverseNode(root, context);
   // 2.修改context
+  createRootCodegen(root)
+}
+function createRootCodegen(root) {
+  root.codegenNode = root.children[0]
 }
 // 创建全局对象
 function createTransformContext(root: any, options: any) {
