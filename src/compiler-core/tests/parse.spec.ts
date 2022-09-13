@@ -20,12 +20,14 @@ describe("parse", () => {
   });
   // 元素类型
   describe("element", () => {
-    test("simple element div", () => {
+    test("simple div", () => {
       const ast = baseParse("<div></div>");
+      const element = ast.children[0];
 
-      expect(ast.children[0]).toStrictEqual({
+      expect(element).toStrictEqual({
         type: NodeTypes.ELEMENT,
         tag: "div",
+        children:[]
       });
     });
   });
@@ -40,7 +42,7 @@ describe("parse", () => {
   });
 
   test("hello world", () => {
-    const ast = baseParse("<div>h1,{{message}}</div>");
+    const ast = baseParse("<div>hi,{{message}}</div>");
     expect(ast.children[0]).toStrictEqual({
       type: NodeTypes.ELEMENT,
       tag: "div",
@@ -61,7 +63,7 @@ describe("parse", () => {
   });
 
   test("Nested element", () => {
-    const ast = baseParse("<div><p>h1</p>{{message}}</div>");
+    const ast = baseParse("<div><p>hi</p>{{message}}</div>");
     expect(ast.children[0]).toStrictEqual({
       type: NodeTypes.ELEMENT,
       tag: "div",
