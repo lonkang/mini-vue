@@ -1,5 +1,10 @@
+import { isString } from "../../shared";
 import { NodeTypes } from "./ast";
-import { helperMapName, TO_DISPLAY_STRING } from "./runtimeHelper";
+import {
+  CREATE_ELEMENT_VNODE,
+  helperMapName,
+  TO_DISPLAY_STRING,
+} from "./runtimeHelper";
 
 export function generate(ast) {
   const context = createCodegenContext();
@@ -43,6 +48,7 @@ function createCodegenContext() {
   };
   return context;
 }
+// 根据节点的类型然后分别处理
 function genNode(node: any, context) {
   switch (node.type) {
     case NodeTypes.TEXT:
@@ -54,8 +60,53 @@ function genNode(node: any, context) {
     case NodeTypes.SIMPLE_EXPRESSION:
       genExpression(node, context);
       break;
+    case NodeTypes.ELEMENT:
+      genElement(node, context);
+      break;
+    case NodeTypes.COMPOUND_EXPRESSION:
+      genCompoundExpression(node, context);
+      break;
     default:
       break;
+  }
+}
+function genElement(node, context) {
+  const { push, helper } = context;
+  const { tag, props, children } = node;
+  push(`${helper(CREATE_ELEMENT_VNODE)}(`);
+  genNodeList(genNullable([tag, props, children]), context);
+  push(`)`);
+}
+function genNodeList(nodes: any, context: any) {
+  const { push } = context;
+  for (let i = 0; i < nodes.length; i++) {
+    const node = nodes[i];
+
+    if (isString(node)) {
+      push(node);
+    } else {
+      genNode(node, context);
+    }
+    // node 和 node 之间需要加上 逗号(,)
+    // 但是最后一个不需要 "div", [props], [children]
+    if (i < nodes.length - 1) {
+      push(", ");
+    }
+  }
+}
+function genNullable(args) {
+  return args.map((arg) => arg || "null");
+}
+function genCompoundExpression(node, context) {
+  const {push} = context
+  const children = node.children
+  for (let i = 0;i < children.length; i++) {
+    const child = children[i]
+    if(isString(child)) {
+      push(child)
+    } else {
+      genNode(child, context)
+    }
   }
 }
 // 处理文本
