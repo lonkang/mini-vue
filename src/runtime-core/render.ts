@@ -315,22 +315,24 @@ export function createRenderer(options) {
   function setupRenderEffect(instace, vnode, container, anchor) {
     function componentUpdateFn() {
       // 绑定proxy 使得render函数能使用this
-      const { proxy, isMounted } = instace;
-      if (!isMounted) {
-        const subTree = instace.render.call(proxy);
-        instace.subTree = subTree;
-        instace.isMounted = true;
+      if (!instace.isMounted) {
+        const { proxy } = instace;
+        const subTree = (instace.subTree = instace.render.call(proxy, proxy));
+
         // vnode => patch
         // vnode => element => mountCompoment
         patch(null, subTree, container, instace, anchor);
         vnode.el = subTree.el;
+        instace.isMounted = true;
       } else {
         const { next, vnode } = instace;
         if (next) {
           next.el = vnode.el;
           updateComponentPreRender(instace, next);
         }
-        const subTree = instace.render.call(proxy);
+        const { proxy } = instace;
+
+        const subTree = instace.render.call(proxy, proxy);
         const prevSubTree = instace.subTree;
         instace.subTree = subTree;
         patch(prevSubTree, subTree, container, instace, anchor);
